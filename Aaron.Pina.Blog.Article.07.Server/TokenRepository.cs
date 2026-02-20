@@ -1,0 +1,22 @@
+namespace Aaron.Pina.Blog.Article._07.Server;
+
+public class TokenRepository(ServerDbContext dbContext)
+{
+    public void SaveToken(TokenEntity token)
+    {
+        dbContext.Tokens.Add(token);
+        dbContext.SaveChanges();
+    }
+
+    public void UpdateToken(TokenEntity token)
+    {
+        dbContext.Tokens.Update(token);
+        dbContext.SaveChanges();
+    }
+
+    public TokenEntity? TryGetTokenByUserId(Guid userId) =>
+        dbContext.Tokens.FirstOrDefault(t => t.UserId == userId);
+
+    public TokenEntity? TryGetTokenByRefreshToken(string refreshToken) =>
+        dbContext.Tokens.FirstOrDefault(t => t.RefreshToken == refreshToken);
+}
