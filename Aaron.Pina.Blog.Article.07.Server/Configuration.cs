@@ -4,7 +4,6 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
 using System.Security.Claims;
 
 namespace Aaron.Pina.Blog.Article._07.Server;
@@ -15,11 +14,7 @@ public static class Configuration
     {
         public static readonly Action<JwtBearerOptions> Options = options =>
         {
-            options.MapInboundClaims = false;
-            options.RequireHttpsMetadata = false;
-            options.Audience = "https://localhost";
-            options.Authority = "https://localhost:5001";
-            options.TokenValidationParameters = new()
+            options.TokenValidationParameters = new TokenValidationParameters
             {
                 ClockSkew = TimeSpan.Zero,
                 ValidateAudience = true,
@@ -40,6 +35,10 @@ public static class Configuration
                     logger.LogWarning("Token {Jti} has been invalidated", jti);
                 }
             };
+            options.MapInboundClaims = false;
+            options.RequireHttpsMetadata = false;
+            options.Audience = "https://localhost";
+            options.Authority = "https://localhost:5001";
         };
     }
 

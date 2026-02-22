@@ -13,8 +13,8 @@ public static class TokenGenerator
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             IssuedAt = now,
-            Issuer = "https://localhost",
             Audience = "https://localhost",
+            Issuer = "https://localhost:5001",
             Expires = now.AddMinutes(expiresIn),
             Subject = new ClaimsIdentity([
                 new Claim("role", role),

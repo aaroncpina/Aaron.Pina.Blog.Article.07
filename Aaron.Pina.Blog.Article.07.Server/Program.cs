@@ -1,4 +1,3 @@
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Aaron.Pina.Blog.Article._07.Shared.Responses;
 using Aaron.Pina.Blog.Article._07.Shared.Requests;
@@ -8,6 +7,7 @@ using Aaron.Pina.Blog.Article._07.Server;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +29,13 @@ app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
     scope.ServiceProvider.GetRequiredService<ServerDbContext>().Database.EnsureCreated();
 
-app.MapGet("/.well-known/openid-configuration", () => new OpenIdConnectConfiguration())
+app.MapGet("/.well-known/openid-configuration", () => Results.Json(
+        new
+        {
+            Issuer  = "https://localhost:5001",
+            JwksUri = "https://localhost:5001/.well-known/jwks.json"
+        },
+        new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower }))
    .AllowAnonymous();
 
 app.MapGet("/.well-known/jwks.json", (RsaKeyProvider rsaKeyProvider) =>
@@ -80,7 +86,7 @@ app.MapGet("/token",
         var now = DateTime.UtcNow;
         var refreshToken = TokenGenerator.GenerateRefreshToken();
         var accessToken = TokenGenerator.GenerateToken(
-            rsaKeyProvider.PublicKey.Value, jti, userId, user.Role, now, config.Value.AccessTokenLifetime);
+            rsaKeyProvider.SigningKey.Value, jti, userId, user.Role, now, config.Value.AccessTokenLifetime);
         var response = new TokenResponse(jti, accessToken, refreshToken, config.Value.AccessTokenLifetime);
         tokenRepo.SaveToken(new TokenEntity
         {
@@ -118,7 +124,7 @@ app.MapPost("/refresh",
         var now = DateTime.UtcNow;
         var newRefreshToken = TokenGenerator.GenerateRefreshToken();
         var accessToken = TokenGenerator.GenerateToken(
-            rsaKeyProvider.PublicKey.Value, jti, token.UserId, user.Role, now, config.Value.AccessTokenLifetime);
+            rsaKeyProvider.SigningKey.Value, jti, token.UserId, user.Role, now, config.Value.AccessTokenLifetime);
         var response = new TokenResponse(jti, accessToken, newRefreshToken, config.Value.AccessTokenLifetime);
         token.RefreshTokenExpiresAt = now.AddMinutes(config.Value.RefreshTokenLifetime);
         token.RefreshToken = newRefreshToken;
