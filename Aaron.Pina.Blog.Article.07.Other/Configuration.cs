@@ -13,7 +13,8 @@ public static class Configuration
             {
                 ClockSkew = TimeSpan.Zero,
                 ValidateAudience = true,
-                ValidateLifetime = true
+                ValidateLifetime = true,
+                ValidateIssuer = true
             };
             options.MapInboundClaims = false;
             options.RequireHttpsMetadata = false;
@@ -21,5 +22,4 @@ public static class Configuration
             options.Authority = "https://localhost:5001";
         };
     }
-
 }

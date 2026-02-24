@@ -9,7 +9,7 @@ public class RsaKeyProvider : IDisposable
 
     public RsaKeyProvider()
     {
-        SigningKey = new Lazy<RsaSecurityKey>(() => new RsaSecurityKey(_rsa));
+        SigningKey = new Lazy<RsaSecurityKey>(() => new RsaSecurityKey(_rsa.ExportParameters(true)));
         PublicKey =  new Lazy<RsaSecurityKey>(() => new RsaSecurityKey(_rsa.ExportParameters(false)));
     }
     

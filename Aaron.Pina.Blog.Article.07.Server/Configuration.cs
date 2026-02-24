@@ -18,7 +18,8 @@ public static class Configuration
             {
                 ClockSkew = TimeSpan.Zero,
                 ValidateAudience = true,
-                ValidateLifetime = true
+                ValidateLifetime = true,
+                ValidateIssuer = true
             };
             options.Events = new JwtBearerEvents
             {
